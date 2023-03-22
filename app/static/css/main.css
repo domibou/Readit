@@ -1,0 +1,44 @@
+#home {
+    color: aqua;
+}
+
+#header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+#homeButton {
+    color: cornflowerblue;
+    font-style: normal;
+    cursor: pointer;
+    font-size: xx-large;
+}
+
+button.largeButton {
+    padding: 10px 10px;
+    border:none;
+    border-radius: 12px;
+    background-color: cornflowerblue;
+    font-size: 16px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+}
+
+button.largeButton:hover {
+    background-color: lightskyblue;
+    color: black;
+}
+
+.tag {
+    background-color: green;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 12px;
+    box-sizing: content-box;
+    font-family: Consolas;
+}
