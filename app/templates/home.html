@@ -3,17 +3,29 @@
 <head>
 	<title>Accueil</title>
 	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
-	<script type="text/javascript" src="../static/js/home.js"></script>
+	<script type="text/javascript" src="../static/js/main.js"></script>
+    <a id="header"href="home">
+        <button id="homeButton">Not Reddit</button>
+    </a>
+    {% if 'user' in session %}
+    <a href="profile" >
+        <button id="profileButton" class="largeButton">{{session["user"]}}</button>
+    </a>
+    <a href="logout" >
+        <button id="logOutButton" class="largeButton">Log out</button>
+    </a>
+    {% else %}
+    <div id="header">
+        <a href="login">
+            <button id="loginButton" class="largeButton"> Log in </button>
+        </a>
+        <a href="signup">
+            <button id="signUpButton" class="largeButton"> Sign up </button>
+        </a>
+    </div>
+    {% endif %}
 </head>
 <body>
-	<div id="header">
-        <a href="home.html" >
-            <button id="homeButton">Not Reddit</button>
-        </a>
-        <div>
-            <button id="loginButton" class="largeButton"> Log in </button>
-            <button id="signUpButton" class="largeButton"> Sign in </button>
-        </div>
     </div>
     <hr>
     <div style="display: flex; flex-direction: column; flex-wrap: wrap">
@@ -27,6 +39,11 @@
                 <li style="list-style: none">List 2 Item exemple</li>
             </ul>
         </div>
+        {% if session["logged_in"] == True %}
+        <div>
+            Home page avec un user connecté, afficher les posts de communautés suivies et autre
+        </div>
+        {% endif %}
 
     </div>
 

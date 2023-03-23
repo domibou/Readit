@@ -7,6 +7,7 @@ signUpButton.addEventListener("click", signUp());
 function login()
 {
     console.log("log in these peanuts");
+    
 }
 
 function signUp()
