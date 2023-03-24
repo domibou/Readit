@@ -19,7 +19,13 @@
 }
 
 #errorLogIn {
-    color: red
+    color: red;
+}
+
+container {
+    align-items: center;
+    color:aquamarine;
+    overflow: auto;
 }
 
 button.largeButton {

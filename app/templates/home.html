@@ -39,12 +39,20 @@
                 <li style="list-style: none">List 2 Item exemple</li>
             </ul>
         </div>
-        {% if session["logged_in"] == True %}
-        <div>
-            Home page avec un user connecté, afficher les posts de communautés suivies et autre
+        {% if posts %}
+        <div class="container">
+            {% for post in posts %}
+                <div class="post">
+                    <h3 class="postTitle">{{post['title']}}</h3>
+                    <p class="postAuthor">{{post['author']}}</p>
+                    <p class="postCommunityName">{{post['community_name']}}</p>
+                    <p class="postContent">{{post['content']}}</p>
+                    <p class="postUpvotes">{{post['upvotes']}}</p>
+                    <p class="postCreation">{{post['creation']}}</p>
+                </div>
+            {% endfor %}
         </div>
         {% endif %}
-
     </div>
 
 </body>
