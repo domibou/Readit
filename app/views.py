@@ -4,7 +4,7 @@ from app import app
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = '954Bibafou'
+db_password = ''
 db_name = 'redditclone'
 
 @app.route('/')
