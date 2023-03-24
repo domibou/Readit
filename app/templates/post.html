@@ -1,24 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Conversation</title>
-    	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
-	<script type="text/javascript" src="../static/js/post.js"></script>
-	<style>
-		.upvote-button {
-			display: inline-block;
-			margin-left: 10px;
-			background-color: #0077cc;
-			color: white;
-			border: none;
-			border-radius: 5px;
-			font-size: 14px;
-			cursor: pointer;
-		}
-	</style>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Post{% endblock %}
 
+{% block header %}
+{% endblock %}
+
+{% block body %}
 	<h1>Conversation</h1>
 
 	<div>
@@ -47,6 +33,4 @@
 	</div>
 
 	<button class="largeButton" style="margin-left: 100px;">Post a reply</button>
-
-</body>
-</html>
+{% endblock %}

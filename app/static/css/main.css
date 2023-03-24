@@ -28,6 +28,26 @@ container {
     overflow: auto;
 }
 
+.community {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+}
+.community img {
+    max-width: 200px;
+    margin-right: 20px;
+}
+.community-name {
+    font-size: 36px;
+    margin-right: 20px;
+}
+
+.creation-date {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 20px;
+}
+
 button.largeButton {
     padding: 10px 10px;
     border:none;
@@ -51,6 +71,17 @@ button.largeButton:hover {
     border-radius: 12px;
     box-sizing: content-box;
     font-family: Consolas;
+}
+
+.upvote-button {
+    display: inline-block;
+    margin-left: 10px;
+    background-color: #0077cc;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
 }
 
 body {
@@ -99,6 +130,70 @@ input[type=submit] {
 input[type=submit]:hover {
     background-color: #3e8e41;
 }
+
+/***************************** POSTS ***************************/
+/***************************************************************/
+
+.post {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    padding: 10px;
+  }
+  
+  .post .title {
+    color: #0079d3;
+    font-size: 20px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .post .title:hover {
+    text-decoration: underline;
+  }
+  
+  .post .author {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .post .author a {
+    color: #666;
+    text-decoration: none;
+  }
+  
+  .post .author a:hover {
+    text-decoration: underline;
+  }
+  
+  .post .content {
+    color: #333;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  
+  .post .upvotes {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .post .creation_date {
+    color: #666;
+    font-size: 14px;
+  }
+  
+  .post .subreddit {
+    color: #666;
+    font-size: 14px;
+    font-weight: bold;
+    text-decoration: none;
+  }
+  
+  .post .subreddit:hover {
+    text-decoration: underline;
+  }
+  
 
 
   

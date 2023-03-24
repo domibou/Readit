@@ -1,16 +1,11 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Accueil</title>
-	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
-	<script type="text/javascript" src="../static/js/home.js"></script>
-    <a id="header"href="home">
-        <button id="homeButton">Not Reddit</button>
-    </a>
-</head>
-<body>
-	<div id="header">
-        <h1>Log in</h1>
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block body %}
+	<div>
         <form action="/login" method="post">
             <p>Username: </p>
             <p><input type="text" name="username"></p>
@@ -26,6 +21,4 @@
             {% endwith %}
         </form>
     </div>
-
-</body>
-</html>
+{% endblock %}

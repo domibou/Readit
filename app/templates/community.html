@@ -1,47 +1,33 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Community</title>
-	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
-	<script type="text/javascript" src="../static/js/community.js"></script>
-	<style>
+{% extends "base.html" %}
+{% block title %}Community{% endblock %}
 
-		.community {
-			display: flex;
-			align-items: center;
-			margin-bottom: 30px;
-		}
-		.community img {
-			max-width: 200px;
-			margin-right: 20px;
-		}
-		.community-name {
-			font-size: 36px;
-			margin-right: 20px;
-		}
+{% block header %}
+{% endblock %}
 
-		.creation-date {
-			font-size: 14px;
-			color: #666;
-			margin-bottom: 20px;
-		}
-	</style>
-</head>
-<body>
-
+{% block body %}
 	<div class="community">
 		<img src="[insert image URL here]" alt="Community image">
-		<h1 class="community-name">[insert community name here]</h1>
+		<h1 class="community-name">{{ community[0]['name'] }}</h1>
+		<p>Followers: {{ followers }}</p>
 		<button class="largeButton">Follow</button>
 	</div>
+	<p class="description">{{ community[0]['description'] }}</p>
+	<p>{{ community[0]['tag'] }}</p>
+	<p class="creation-date">Created on {{ community[0]['creation_date'] }}</p>
 
-	<p class="description">[insert description here]</p>
-	<div class="tags">
-		<span class="tag">[insert tag here]</span>
-		<span class="tag">[insert tag here]</span>
-		<span class="tag">[insert tag here]</span>
-	</div>
-	<p class="creation-date">Created on [insert date here]</p>
+	{% if posts %}
+        <div class="container">
+            {% for post in posts %}
+			<div class="post">
+				<a href="{{ url_for('post', post_id=post['post_id']) }}" class="title">{{ post['title'] }}</a>
+				<p class="author">Posted by <a href="{{ url_for('profile', user_id=post['user_id']) }}">{{ post['username'] }}</a></p>
+				<p class="content">{{ post['content'] }}</p>
+				<p class="upvotes">Upvotes: {{ post['upvotes'] }}</p>
+				<p class="creation_date">Posted on {{ post['creation_date'] }}</p>
+				<a href="{{ url_for('community', community_id=post['community_id']) }}" class="community">{{ post['name'] }}</a>
+			  </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
-</body>
-</html>
+{% endblock %}

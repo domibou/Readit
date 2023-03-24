@@ -1,31 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-	<title>Accueil</title>
-	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
-	<script type="text/javascript" src="../static/js/main.js"></script>
-    <a id="header"href="home">
-        <button id="homeButton">Not Reddit</button>
-    </a>
-    {% if 'user' in session %}
-    <a href="profile" >
-        <button id="profileButton" class="largeButton">{{session["user"]}}</button>
-    </a>
-    <a href="logout" >
-        <button id="logOutButton" class="largeButton">Log out</button>
-    </a>
-    {% else %}
-    <div id="header">
-        <a href="login">
-            <button id="loginButton" class="largeButton"> Log in </button>
-        </a>
-        <a href="signup">
-            <button id="signUpButton" class="largeButton"> Sign up </button>
-        </a>
-    </div>
-    {% endif %}
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block body %}
     </div>
     <hr>
     <div style="display: flex; flex-direction: column; flex-wrap: wrap">
@@ -42,18 +21,16 @@
         {% if posts %}
         <div class="container">
             {% for post in posts %}
-                <div class="post">
-                    <h3 class="postTitle">{{post['title']}}</h3>
-                    <p class="postAuthor">{{post['author']}}</p>
-                    <p class="postCommunityName">{{post['community_name']}}</p>
-                    <p class="postContent">{{post['content']}}</p>
-                    <p class="postUpvotes">{{post['upvotes']}}</p>
-                    <p class="postCreation">{{post['creation']}}</p>
-                </div>
+            <div class="post">
+				<a href="{{ url_for('post', post_id=post['post_id']) }}" class="title">{{ post['title'] }}</a>
+				<p class="author">Posted by <a href="{{ url_for('profile', user_id=post['user_id']) }}">{{ post['username'] }}</a></p>
+				<p class="content">{{ post['content'] }}</p>
+				<p class="upvotes">Upvotes: {{ post['upvotes'] }}</p>
+				<p class="creation_date">Posted on {{ post['creation_date'] }}</p>
+				<a href="{{ url_for('community', community_id=post['community_id']) }}" class="community">{{ post['name'] }}</a>
+			  </div>
             {% endfor %}
         </div>
         {% endif %}
     </div>
-
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+	<link rel="stylesheet" type="text/css" href="../static/css/main.css">
+	<script type="text/javascript" src="../static/js/main.js"></script>
+    <a id="header"href="home">
+        <button id="homeButton">Not Reddit</button>
+    </a>
+    {% if 'user' in session %}
+    <a href="{{ url_for('profile', user_id=session['user_id']) }}" >
+        <button id="profileButton" class="largeButton">{{session["user"]}}</button>
+    </a>
+    <a href="logout" >
+        <button id="logOutButton" class="largeButton">Log out</button>
+    </a>
+    {% else %}
+    <div id="header">
+        <a href="login">
+            <button id="loginButton" class="largeButton"> Log in </button>
+        </a>
+        <a href="signup">
+            <button id="signUpButton" class="largeButton"> Sign up </button>
+        </a>
+    </div>
+    {% endif %}
+</head>
+<body>
+{% block body %}{% endblock %}
+</body>
+</html>
