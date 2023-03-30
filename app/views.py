@@ -93,11 +93,33 @@ def profile():
 @app.route('/post')
 def post():
     post_id = request.args.get('post_id')
+    post = []
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
 
-    return render_template('post.html')
+    # Informations sur le post
+    query = f"SELECT * FROM Post WHERE post_id = {post_id}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post.append({'post_id': result[0], 'user_id': result[1], 'community_id': result[2],
+                      'creation_date': result[3], 'content': result[4], 'upvotes': result[5], 'title': result[6]})
+
+    # Auteur
+    query = f"SELECT username FROM User WHERE user_id = {post[0]['user_id']}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post[0]['username'] = result[0]
+
+    # Nom communaute
+    query = f"SELECT name FROM Community WHERE community_id = {post[0]['community_id']}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post[0]['community'] = result[0]
+
+    return render_template('post.html', post=post, comments=loadposts(post[0]['post_id']))
     
 @app.route('/community')
-def community():
+def community(): #on pourrait montrer le nombre de commentaires
     community_id = request.args.get('community_id')
     community = []
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
@@ -133,7 +155,7 @@ def loadposts(community_id=None):
             query = f"SELECT * FROM Post WHERE community_id = {community_id} LIMIT 20"
         else:
             # Pour des posts aléatoires des communautés suivies par l'utilisateur (pour la home page)
-            query = f"CALL RandomPosts({session['user_id']})"
+            query = f"CALL RandomPosts({session['user_id']},5)"
 
         # Informations sur les posts
         cursor.execute(query)
@@ -165,3 +187,33 @@ def loadposts(community_id=None):
     return posts
     
 
+def loadreplies(post_id):
+    comments = []
+    if 'user' in session:
+        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+        cursor = cnx.cursor()
+
+        query = f"SELECT * FROM Comment WHERE post_id = {post_id} "
+
+
+        # Informations sur les posts
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for r in result:
+            comments.append({'comment_id': r[0], 'post_id': r[1], 'user_id': r[2],
+                          'content': r[3], 'creation_date': r[4], 'upvotes': r[5]})
+
+        # Récupère les noms des auteurs des comments.
+        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+        cursor = cnx.cursor()
+        for c in comments:
+            # Auteur
+            query = f"SELECT username FROM User WHERE user_id = {c['user_id']}"
+            cursor.execute(query)
+            result = cursor.fetchone()
+            c['username'] = result[0]
+
+
+        cursor.close()
+        cnx.close()
+    return comments

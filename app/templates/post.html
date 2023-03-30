@@ -5,32 +5,29 @@
 {% endblock %}
 
 {% block body %}
-	<h1>Conversation</h1>
+	<h1><a href="{{ url_for('community', community_id=post[0]['community_id']) }}" >{{ post[0]['community'] }}</a></h1>
 
-	<div>
-		<h2>Post by [insert username here] on [insert date here]</h2>
-		<p>[insert post content here]</p>
-		<p>Rating: <span class="rating">[insert rating here]</span><button class="upvote-button">Upvote</button></p>
+	<div class="post">
+		<h2>Posted by <a href="{{ url_for('profile', user_id=post[0]['user_id']) }}">{{ post[0]['username'] }}</a> on {{ post[0]['creation_date']}}</h2>
+		<p>{{ [post[0]['content']] }}</p>
+		<p>Upvotes: <span class="rating">{{ post[0]['upvotes']}}</span><button class="upvote-button">Upvote</button></p>
+        <p class="creation_date">Posted on {{ post[0]['creation_date'] }}</p>
 	</div>
 
-	<div style="margin-left: 50px;">
-		<h3>Replies:</h3>
-		<div>
-			<h4>Reply by [insert username here] on [insert date here]</h4>
-			<p>[insert reply content here]</p>
-			<p>Rating: <span class="rating">[insert rating here]</span><button class="upvote-button">Upvote</button></p>
-		</div>
-		<div>
-			<h4>Reply by [insert username here] on [insert date here]</h4>
-			<p>[insert reply content here]</p>
-			<p>Rating: <span class="rating">[insert rating here]</span><button class="upvote-button">Upvote</button></p>
-		</div>
-		<div>
-			<h4>Reply by [insert username here] on [insert date here]</h4>
-			<p>[insert reply content here]</p>
-			<p>Rating: <span class="rating">[insert rating here]</span><button class="upvote-button">Upvote</button></p>
-		</div>
-	</div>
+	{% if comments %}
+        <div class="container">
+            {% for comment in comments %}
+			<div class="post">
+				<p class="author">Posted by <a href="{{ url_for('profile', user_id=comment['user_id']) }}">{{ comment['username'] }}</a></p>
+				<p class="content">{{ comment['content'] }}</p>
+				<p class="upvotes">Upvotes: {{ comment['upvotes'] }}<button class="upvote-button">Upvote</button></p>
+				<p class="creation_date">Posted on {{ comment['creation_date'] }}</p>
+			  </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
-	<button class="largeButton" style="margin-left: 100px;">Post a reply</button>
+<div style="text-align: center;">
+  <button class="largeButton">Post a reply</button>
+</div>
 {% endblock %}
