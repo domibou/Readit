@@ -7,14 +7,21 @@
 {% block body %}
     </div>
     <div style="display: flex; flex-direction: column; flex-wrap: wrap">
-        <div style="display: flex; flex-direction: row; justify-content: flex-start">
-            <ul  id="communitiesList" name="communitiesList">
-                <h3>Communities</h3>
-                <li style="list-style: none">List Item exemple</li>
-            </ul>
+        <div style="display: flex; flex-direction: column; justify-content: flex-start">
+            <h3>My Communities</h3>
+            <div style="display: flex; flex-direction: row; justify-content: flex-start">
+            {% for c in communities %}
+            <a href="{{ url_for('community', community_id=c['community_id']) }}" style="text-decoration: none">
+                <button class="communityButton" style="padding: 6px; margin: 0px 2px 0px; border-radius: 20px; font-size: 16px; cursor: pointer">
+                    {{ c['name'] }}
+                </button>
+            </a>
+            {% endfor %}
+            </div>
         </div>
         {% if posts %}
         <div class="container">
+            <h3>Posts From my Communities</h3>
             {% for post in posts %}
             <div class="post">
 				<a href="{{ url_for('post', post_id=post['post_id']) }}" class="title">{{ post['title'] }}</a>

@@ -64,6 +64,14 @@ button.largeButton:hover {
     color: black;
 }
 
+/*.communityButton {*/
+/*    padding: 6px;*/
+/*    margin: 0px 2px 0px;*/
+/*    border-radius: 20px;*/
+/*    font-size: 16px;*/
+/*    cursor: pointer;*/
+/*}*/
+
 .tag {
     background-color: green;
     color: white;

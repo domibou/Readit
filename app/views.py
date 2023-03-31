@@ -13,7 +13,21 @@ def main():
 
 @app.route('/home')
 def home():
-    return render_template('home.html', posts=loadposts())
+    communities = []
+
+    if 'user' in session:
+        user_id = session['user_id']
+        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+        cursor = cnx.cursor()
+        query = f"SELECT * FROM Community WHERE community_id IN (SELECT community_id FROM Subscription WHERE user_id = {user_id})"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for r in result:
+            communities.append({'community_id': r[0], 'description': r[1], 'tag': r[2],
+                                'name': r[3], 'creation_date': r[4]})
+        cursor.close()
+        cnx.close()
+    return render_template('home.html', posts=loadposts(), communities=communities)
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
