@@ -1,4 +1,5 @@
-from flask import render_template, session, request, redirect, url_for, flash, jsonify
+from flask import render_template, session, request, redirect, url_for, flash
+import hashlib
 from mysql import connector
 from app import app
 
@@ -36,7 +37,7 @@ def login():
         # username: WebDeveloper_
         # password: ia
         username = request.form['username']
-        password = request.form['password']
+        password = request.form['encryptedPassword']
 
         # Conserver ce format dans les requêtes où l'utilisateur envoie du texte (avec placeholder %s)
         # pour éviter les injections de code
@@ -47,7 +48,7 @@ def login():
         cursor = cnx.cursor()
         cursor.execute(query, val)
         result = cursor.fetchone()
-    
+
         if result is not None and result[6] == password:
             session['user_id'] = result[0]
             session['user'] = result[1]
