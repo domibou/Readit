@@ -5,7 +5,7 @@ from app import app
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = ''
+db_password = 'Po1iuytr'
 db_name = 'redditclone'
 
 @app.route('/')
@@ -131,10 +131,15 @@ def post():
     result = cursor.fetchone()
     post[0]['community'] = result[0]
 
-    return render_template('post.html', post=post, comments=loadposts(post[0]['post_id']))
+    _comments = loadposts(post[0]['post_id']);
+
+    # post[0]['replies'] = len(_comments)
+
+
+    return render_template('post.html', post=post, comments=_comments)
     
 @app.route('/community')
-def community(): #on pourrait montrer le nombre de commentaires
+def community():
     community_id = request.args.get('community_id')
     community = []
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
@@ -197,6 +202,12 @@ def loadposts(community_id=None):
             result = cursor.fetchone()
             p['name'] = result[0]
 
+            # # Nombre de replies
+            # query = f"SELECT COUNT(*) FROM Comment C WHERE C.post_id  = {p['post_id']}"
+            # cursor.execute(query)
+            # result = cursor.fetchone()
+            # p['replies'] = result[0]
+
         cursor.close()
         cnx.close()
     return posts
@@ -208,7 +219,7 @@ def loadreplies(post_id):
         cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
         cursor = cnx.cursor()
 
-        query = f"SELECT * FROM Comment WHERE post_id = {post_id} "
+        query = f"SELECT * FROM Comment C WHERE C.post_id = {post_id} "
 
 
         # Informations sur les posts
