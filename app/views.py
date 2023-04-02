@@ -75,7 +75,7 @@ def signup():
 
         cursor.close()
         cnx.close()
-        return render_template('home.html')
+        return render_template('login.html')
     else:
 
         return render_template('signup.html')
@@ -191,50 +191,54 @@ def loadUserCommunities():
 
 def loadposts(community_id=None):
     posts = []
+    query = ''
     if 'user' in session:
-        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
-        cursor = cnx.cursor()
-
         if community_id:
             # Pour les posts d'une communauté
             query = f"SELECT * FROM Post WHERE community_id = {community_id} LIMIT 20"
         else:
             # Pour des posts aléatoires des communautés suivies par l'utilisateur (pour la home page)
             query = f"CALL RandomPosts({session['user_id']},5)"
+    else:
+        # Posts aléatoires dans le tableau au complet lorsqu'on n'est pas logged in
+        query = f"CALL RandomPostsNotLoggedIn(10)"
 
-        # Informations sur les posts
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
+    # Informations sur les posts
+    cursor.execute(query)
+    result = cursor.fetchall()
+    for r in result:
+        posts.append({'post_id': r[0], 'user_id': r[1], 'community_id': r[2],
+                      'creation_date': r[3], 'content': r[4], 'upvotes': r[5],
+                      'title': r[6]})
+
+    # Récupère les noms des auteurs et des communautés reliés aux posts.
+    # Vraiment pas efficace mais on a seulement les identifiants dans notre table Post
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
+    for p in posts:
+        # Auteur
+        query = f"SELECT username FROM User WHERE user_id = {p['user_id']}"
         cursor.execute(query)
-        result = cursor.fetchall()
-        for r in result:
-            posts.append({'post_id': r[0], 'user_id': r[1], 'community_id': r[2],
-                          'creation_date': r[3], 'content': r[4], 'upvotes': r[5],
-                          'title': r[6]})
-            
-        # Récupère les noms des auteurs et des communautés reliés aux posts. 
-        # Vraiment pas efficace mais on a seulement les identifiants dans notre table Post 
-        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
-        cursor = cnx.cursor()
-        for p in posts:
-            # Auteur
-            query = f"SELECT username FROM User WHERE user_id = {p['user_id']}"
-            cursor.execute(query)
-            result = cursor.fetchone()
-            p['username'] = result[0]
+        result = cursor.fetchone()
+        p['username'] = result[0]
 
-            # Communauté
-            query = f"SELECT name FROM Community WHERE community_id = {p['community_id']}"
-            cursor.execute(query)
-            result = cursor.fetchone()
-            p['name'] = result[0]
+        # Communauté
+        query = f"SELECT name FROM Community WHERE community_id = {p['community_id']}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        p['name'] = result[0]
 
-            # # Nombre de replies
-            # query = f"SELECT COUNT(*) FROM Comment C WHERE C.post_id  = {p['post_id']}"
-            # cursor.execute(query)
-            # result = cursor.fetchone()
-            # p['replies'] = result[0]
+        # # Nombre de replies
+        # query = f"SELECT COUNT(*) FROM Comment C WHERE C.post_id  = {p['post_id']}"
+        # cursor.execute(query)
+        # result = cursor.fetchone()
+        # p['replies'] = result[0]
 
-        cursor.close()
-        cnx.close()
+    cursor.close()
+    cnx.close()
+
     return posts
     
 
@@ -244,7 +248,7 @@ def loadreplies(post_id):
         cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
         cursor = cnx.cursor()
 
-        query = f"SELECT * FROM Comment C WHERE C.post_id = {post_id} "
+        query = f"SELECT * FROM Comment WHERE post_id = {post_id} "
 
 
         # Informations sur les posts
