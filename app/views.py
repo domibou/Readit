@@ -2,33 +2,20 @@ from flask import render_template, session, request, redirect, url_for, flash
 import hashlib
 from mysql import connector
 from app import app
+from datetime import datetime
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = ''
+db_password = 'Po1iuytr2'
 db_name = 'redditclone'
 
 @app.route('/')
 def main():
-    return render_template('home.html', posts=loadposts())
+    return render_template('home.html', posts=loadposts(), communities=loadUserCommunities())
 
 @app.route('/home')
 def home():
-    communities = []
-
-    if 'user' in session:
-        user_id = session['user_id']
-        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
-        cursor = cnx.cursor()
-        query = f"SELECT * FROM Community WHERE community_id IN (SELECT community_id FROM Subscription WHERE user_id = {user_id})"
-        cursor.execute(query)
-        result = cursor.fetchall()
-        for r in result:
-            communities.append({'community_id': r[0], 'description': r[1], 'tag': r[2],
-                                'name': r[3], 'creation_date': r[4]})
-        cursor.close()
-        cnx.close()
-    return render_template('home.html', posts=loadposts(), communities=communities)
+    return render_template('home.html', posts=loadposts(), communities=loadUserCommunities())
 
 @app.route('/login', methods=["POST", "GET"])
 def login():
@@ -54,7 +41,7 @@ def login():
             session['user'] = result[1]
             cursor.close()
             cnx.close()
-            return render_template('home.html', posts=loadposts())
+            return render_template('home.html', posts=loadposts(), communities=loadUserCommunities())
         else:
             flash("Incorrect username or password")
             cursor.close()
@@ -68,9 +55,30 @@ def logout():
     session.clear()
     return redirect(url_for("login"))
 
-@app.route('/signup')
+@app.route('/signup', methods=["POST", "GET"])
 def signup():
-    return render_template('signup.html')
+    if request.method == "POST":
+        email = request.form['email']
+        username = request.form['username']
+        password = request.form['encryptedPassword']
+
+        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+
+        current_time = datetime.today()
+        formatted_date = current_time.strftime('%Y-%m-%d')
+
+        cursor = cnx.cursor()
+        query = f"INSERT INTO User(username, creation_date, email, password) VALUES ('{username}', '{formatted_date}', '{email}', '{password}')"
+        cursor.execute(query)
+        cursor.fetchall()
+        cnx.commit()
+
+        cursor.close()
+        cnx.close()
+        return render_template('home.html')
+    else:
+
+        return render_template('signup.html')
 
 @app.route('/profile')
 def profile():
@@ -158,6 +166,23 @@ def community(): #on pourrait montrer le nombre de commentaires
     cnx.close()
     return render_template('community.html', community=community, 
                            followers=followers, posts=loadposts(community[0]['community_id']))
+
+def loadUserCommunities():
+    communities = []
+
+    if 'user' in session:
+        user_id = session['user_id']
+        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+        cursor = cnx.cursor()
+        query = f"SELECT * FROM Community WHERE community_id IN (SELECT community_id FROM Subscription WHERE user_id = {user_id})"
+        cursor.execute(query)
+        result = cursor.fetchall()
+        for r in result:
+            communities.append({'community_id': r[0], 'description': r[1], 'tag': r[2],
+                                'name': r[3], 'creation_date': r[4]})
+        cursor.close()
+        cnx.close()
+    return communities
 
 def loadposts(community_id=None):
     posts = []

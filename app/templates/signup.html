@@ -1,8 +1,40 @@
 {% extends "base.html" %}
-{% block title %}Sign up{% endblock %}
+{% block title %}Log in{% endblock %}
 
 {% block header %}
 {% endblock %}
 
 {% block body %}
+	<div>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+        <script>
+            function encryptPassword()
+            {
+                document.getElementById("encryptedPassword").value = CryptoJS.SHA256(document.getElementById("password").value);
+                return true;
+            }
+            document.getElementById("loginForm").addEventListener("submit", function() {this.reset();});
+        </script>
+        <form id="loginForm" method="post" action="/signup" onsubmit="return encryptPassword()">
+            <p>Email: </p>
+            <p><input type="text" name="email"></p>
+            <p>Username: </p>
+            <p><input type="text" name="username"></p>
+            <p>Password: </p>
+            <p><input id="password" type="password" name="password"></p>
+            <!--On sépare le mdp entré par l'utilisateur de celui encrypté par la fonction JS
+            autrement le mdp encrypté apparait brièvement dans le champ de saisie du mdp sur la page web
+            pcq la valeur entrée par l'utilisateur est modifiée pour celle encryptée avant que le formulaire
+            ne soit envoyé-->
+            <input id="encryptedPassword" type="hidden" name="encryptedPassword">
+            <p><input type="submit" value="submit"></p>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for msg in messages %}
+                        <p id="errorSignup">{{msg}}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+        </form>
+    </div>
 {% endblock %}
