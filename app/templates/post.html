@@ -10,9 +10,10 @@
 	<div class="post">
 		<h2>Posted by <a href="{{ url_for('profile', user_id=post[0]['user_id']) }}">{{ post[0]['username'] }}</a> on {{ post[0]['creation_date']}}</h2>
 		<p>{{ [post[0]['content']] }}</p>
-		<p>Upvotes: <span class="rating">{{ post[0]['upvotes']}}</span><button class="upvote-button">Upvote</button></p>
+		<p class="upvotes">Upvotes: {{ post[0]['upvotes']}}<button class="upvote-button">Upvote</button></p>
+        <p class="upvotes">Replies: {{ post[0]['replies'] }}</p>
         <p class="creation_date">Posted on {{ post[0]['creation_date'] }}</p>
-        <p>Replies {{ post[0]['replies'] }}</p>
+
 	</div>
 
 	{% if comments %}

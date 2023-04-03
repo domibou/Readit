@@ -125,7 +125,7 @@ def post():
     cursor.execute(query)
     result = cursor.fetchone()
     post.append({'post_id': result[0], 'user_id': result[1], 'community_id': result[2],
-                      'creation_date': result[3], 'content': result[4], 'upvotes': result[5], 'title': result[6]})
+                      'creation_date': result[3], 'content': result[4], 'title': result[5]})
 
     # Auteur
     query = f"SELECT username FROM User WHERE user_id = {post[0]['user_id']}"
@@ -138,6 +138,12 @@ def post():
     cursor.execute(query)
     result = cursor.fetchone()
     post[0]['community'] = result[0]
+
+    # Nombre d'upvotes
+    query = f"SELECT COUNT(*) FROM Upvote WHERE post_id  = {post[0]['post_id']}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post[0]['upvotes'] = result[0]
 
     _comments = loadreplies(post[0]['post_id']);
 
@@ -210,8 +216,8 @@ def loadposts(community_id=None):
     result = cursor.fetchall()
     for r in result:
         posts.append({'post_id': r[0], 'user_id': r[1], 'community_id': r[2],
-                      'creation_date': r[3], 'content': r[4], 'upvotes': r[5],
-                      'title': r[6]})
+                      'creation_date': r[3], 'content': r[4],
+                      'title': r[5]})
 
     # Récupère les noms des auteurs et des communautés reliés aux posts.
     # Vraiment pas efficace mais on a seulement les identifiants dans notre table Post
@@ -231,10 +237,16 @@ def loadposts(community_id=None):
         p['name'] = result[0]
 
         # Nombre de replies
-        query = f"SELECT COUNT(*) FROM Comment C WHERE C.post_id  = {p['post_id']}"
+        query = f"SELECT COUNT(*) FROM Comment WHERE post_id  = {p['post_id']}"
         cursor.execute(query)
         result = cursor.fetchone()
         p['replies'] = result[0]
+
+        #Nombre d'upvotes
+        query = f"SELECT COUNT(*) FROM Upvote WHERE post_id  = {p['post_id']}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        p['upvotes'] = result[0]
 
     cursor.close()
     cnx.close()
@@ -256,7 +268,7 @@ def loadreplies(post_id):#contains comment
         result = cursor.fetchall()
         for r in result:
             comments.append({'comment_id': r[0], 'post_id': r[1], 'user_id': r[2],
-                          'content': r[3], 'creation_date': r[4], 'upvotes': r[5]})
+                          'content': r[3], 'creation_date': r[4]})
 
         # Récupère les noms des auteurs des comments.
         cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
@@ -267,6 +279,8 @@ def loadreplies(post_id):#contains comment
             cursor.execute(query)
             result = cursor.fetchone()
             c['username'] = result[0]
+
+            #count upvotes oups j'ai oublié d'en generer pour les comments
 
 
         cursor.close()
