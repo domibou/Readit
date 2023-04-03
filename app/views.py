@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = ''
+db_password = 'Po1iuytr'
 db_name = 'redditclone'
 
 @app.route('/')
@@ -139,9 +139,9 @@ def post():
     result = cursor.fetchone()
     post[0]['community'] = result[0]
 
-    _comments = loadposts(post[0]['post_id']);
+    _comments = loadreplies(post[0]['post_id']);
 
-    # post[0]['replies'] = len(_comments)
+    post[0]['replies'] = len(_comments)
 
 
     return render_template('post.html', post=post, comments=_comments)
@@ -230,11 +230,11 @@ def loadposts(community_id=None):
         result = cursor.fetchone()
         p['name'] = result[0]
 
-        # # Nombre de replies
-        # query = f"SELECT COUNT(*) FROM Comment C WHERE C.post_id  = {p['post_id']}"
-        # cursor.execute(query)
-        # result = cursor.fetchone()
-        # p['replies'] = result[0]
+        # Nombre de replies
+        query = f"SELECT COUNT(*) FROM Comment C WHERE C.post_id  = {p['post_id']}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        p['replies'] = result[0]
 
     cursor.close()
     cnx.close()
@@ -242,7 +242,7 @@ def loadposts(community_id=None):
     return posts
     
 
-def loadreplies(post_id):
+def loadreplies(post_id):#contains comment
     comments = []
     if 'user' in session:
         cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)

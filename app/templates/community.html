@@ -25,7 +25,7 @@
 				<p class="upvotes">Upvotes: {{ post['upvotes'] }}</p>
 				<p class="creation_date">Posted on {{ post['creation_date'] }}</p>
 				<a href="{{ url_for('community', community_id=post['community_id']) }}" class="community">{{ post['name'] }}</a>
-{#                <p> Replies: {{ post['replies'] }}</p>#}
+                <p> Replies: {{ post['replies'] }}</p>
 			  </div>
             {% endfor %}
         </div>
