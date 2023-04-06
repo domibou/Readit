@@ -23,19 +23,29 @@
         </a>
 	{% endfor %}
 
-	<p>Posts: {{ posts }}</p>
-	<ul>
-		<li>[insert post 1 here]</li>
-		<li>[insert post 2 here]</li>
-		<li>[insert post 3 here]</li>
-		<!-- Repeat as necessary -->
-	</ul>
+    <p>Posts made : {{ postcount }}</p>
+	{% if posts %}
+        <div class="container">
+            {% for post in posts %}
+			<div class="post">
+				<a href="{{ url_for('post', post_id=post['post_id']) }}" class="title">{{ post['title'] }}</a>
+				<a href="{{ url_for('community', community_id=post['community_id']) }}" class="community">{{ post['community'] }}</a>
+			  </div>
+            {% endfor %}
+        </div>
+        {% endif %}
 
-	<h3>Comments:</h3>
-	<ul>
-		<li>[insert comment 1 here]</li>
-		<li>[insert comment 2 here]</li>
-		<li>[insert comment 3 here]</li>
-		<!-- Repeat as necessary -->
-	</ul>
+{#    <p>Comments made : {{ commentcount }}</p>#}
+{#	{% if comments %}#}
+{#        <div class="container">#}
+{#            {% for comment in comments %}#}
+{#			<div class="post">#}
+{#				<p class="author">Posted by <a href="{{ url_for('profile', user_id=comment['user_id']) }}">{{ comment['username'] }}</a></p>#}
+{#				<p class="content">{{ comment['content'] }}</p>#}
+{#				<p class="upvotes">Upvotes: {{ comment['upvotes']}}<button class="upvote-button">Upvote</button></p>#}
+{#				<p class="creation_date">Posted on {{ comment['creation_date'] }}</p>#}
+{#			  </div>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#        {% endif %}#}
 {% endblock %}

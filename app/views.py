@@ -6,7 +6,7 @@ from datetime import datetime
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = 'Po1iuytr'
+db_password = 'po1iuytr'
 db_name = 'redditclone'
 
 @app.route('/')
@@ -103,17 +103,45 @@ def profile():
         communities.append({'community_id': r[0], 'description': r[1], 'tag': r[2],
                       'name': r[3], 'creation_date': r[4]})
 
-    # Nombre de posts faits par l'utilisateur
-    query = f"SELECT COUNT(*) FROM MakesPost WHERE user_id = {user_id}"
+    # # Nombre de posts faits par l'utilisateur
+    # query = f"SELECT COUNT(*) FROM MakesPost WHERE user_id = {user_id}"
+    # cursor.execute(query)
+    # result = cursor.fetchone()
+    # posts = result[0]
+
+    #posts de l'utilisateur
+    posts =[]
+    query = f"SELECT * FROM Post WHERE user_id = {user_id} "
     cursor.execute(query)
-    result = cursor.fetchone()
-    posts = result[0]
+    result = cursor.fetchall()
+    for r in result:
+        posts.append({'post_id': r[0], 'user_id': r[1], 'community_id': r[2],
+                     'creation_date': r[3], 'content': r[4], 'title': r[5]})
+
+    # Récupère les noms des auteurs des comments.
+    for p in posts:
+        # Auteur
+        query = f"SELECT name FROM Community WHERE community_id = {p['community_id']}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        p['community'] = result[0]
+    # #commentaires de l'utilisateur
+    # comments =[]
+    # query = f"SELECT * FROM Comment WHERE user_id = {user_id} "
+    # cursor.execute(query)
+    # result = cursor.fetchall()
+    # for r in result:
+    #     comments.append({'comment_id': r[0], 'post_id': r[1], 'user_id': r[2],
+    #                      'content': r[3], 'creation_date': r[4]})
+
+    postcount = len(posts)
+    # commentcount = len(comments)
 
     cursor.close()
     cnx.close()
-    return render_template('profile.html', profile=profile, communities=communities, posts=posts)
+    return render_template('profile.html', profile=profile, communities=communities, posts=posts,postcount=postcount)
 
-@app.route('/post')
+@app.route('/post' )
 def post():
     post_id = request.args.get('post_id')
     post = []
@@ -127,30 +155,16 @@ def post():
     post.append({'post_id': result[0], 'user_id': result[1], 'community_id': result[2],
                       'creation_date': result[3], 'content': result[4], 'title': result[5]})
 
-    # Auteur
-    query = f"SELECT username FROM User WHERE user_id = {post[0]['user_id']}"
-    cursor.execute(query)
-    result = cursor.fetchone()
-    post[0]['username'] = result[0]
-
-    # Nom communaute
-    query = f"SELECT name FROM Community WHERE community_id = {post[0]['community_id']}"
-    cursor.execute(query)
-    result = cursor.fetchone()
-    post[0]['community'] = result[0]
-
-    # Nombre d'upvotes
-    query = f"SELECT COUNT(*) FROM Upvote WHERE post_id  = {post[0]['post_id']}"
-    cursor.execute(query)
-    result = cursor.fetchone()
-    post[0]['upvotes'] = result[0]
-
-    _comments = loadreplies(post[0]['post_id']);
-
-    post[0]['replies'] = len(_comments)
+    fillpost(post[0],cursor)
+    canupvote = False
+    if 'user' in session:
+        query = f"SELECT COUNT(*) FROM Upvote WHERE user_id = {session['user_id']} AND post_id = {post_id}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        canupvote =result[0]==0;
 
 
-    return render_template('post.html', post=post, comments=_comments)
+    return render_template('post.html', post=post, comments=loadreplies(post[0]['post_id']),canupvote=canupvote)
     
 @app.route('/community')
 def community():
@@ -194,6 +208,20 @@ def loadUserCommunities():
         cursor.close()
         cnx.close()
     return communities
+@app.route('/upvote' )
+def upvote():
+    post_id = request.args.get('post_id')
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
+
+    #upvote
+    if 'user' in session:
+        query = f"INSERT INTO Upvote(post_id,user_id) VALUES ('{post_id}', '{session['user_id']}')"
+        cursor.execute(query)
+        cursor.fetchall()
+        cnx.commit()
+
+    return post()
 
 def loadposts(community_id=None):
     posts = []
@@ -224,29 +252,8 @@ def loadposts(community_id=None):
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
     cursor = cnx.cursor()
     for p in posts:
-        # Auteur
-        query = f"SELECT username FROM User WHERE user_id = {p['user_id']}"
-        cursor.execute(query)
-        result = cursor.fetchone()
-        p['username'] = result[0]
+        fillpost(p,cursor)
 
-        # Communauté
-        query = f"SELECT name FROM Community WHERE community_id = {p['community_id']}"
-        cursor.execute(query)
-        result = cursor.fetchone()
-        p['name'] = result[0]
-
-        # Nombre de replies
-        query = f"SELECT COUNT(*) FROM Comment WHERE post_id  = {p['post_id']}"
-        cursor.execute(query)
-        result = cursor.fetchone()
-        p['replies'] = result[0]
-
-        #Nombre d'upvotes
-        query = f"SELECT COUNT(*) FROM Upvote WHERE post_id  = {p['post_id']}"
-        cursor.execute(query)
-        result = cursor.fetchone()
-        p['upvotes'] = result[0]
 
     cursor.close()
     cnx.close()
@@ -261,8 +268,6 @@ def loadreplies(post_id):#contains comment
         cursor = cnx.cursor()
 
         query = f"SELECT * FROM Comment WHERE post_id = {post_id} "
-
-
         # Informations sur les posts
         cursor.execute(query)
         result = cursor.fetchall()
@@ -271,8 +276,6 @@ def loadreplies(post_id):#contains comment
                           'content': r[3], 'creation_date': r[4]})
 
         # Récupère les noms des auteurs des comments.
-        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
-        cursor = cnx.cursor()
         for c in comments:
             # Auteur
             query = f"SELECT username FROM User WHERE user_id = {c['user_id']}"
@@ -280,9 +283,33 @@ def loadreplies(post_id):#contains comment
             result = cursor.fetchone()
             c['username'] = result[0]
 
-            #count upvotes oups j'ai oublié d'en generer pour les comments
-
 
         cursor.close()
         cnx.close()
     return comments
+
+def fillpost(post, cursor):
+
+    # Auteur
+    query = f"SELECT username FROM User WHERE user_id = {post['user_id']}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post['username'] = result[0]
+
+    # Nom communaute
+    query = f"SELECT name FROM Community WHERE community_id = {post['community_id']}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post['community'] = result[0]
+
+    # Nombre d'upvotes
+    query = f"SELECT COUNT(*) FROM Upvote WHERE post_id  = {post['post_id']}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post['upvotes'] = result[0]
+
+    # Nombre de replies
+    query = f"SELECT COUNT(*) FROM Comment WHERE post_id  = {post['post_id']}"
+    cursor.execute(query)
+    result = cursor.fetchone()
+    post['replies'] = result[0]

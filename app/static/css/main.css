@@ -91,6 +91,16 @@ button.largeButton:hover {
     font-size: 14px;
     cursor: pointer;
 }
+.tst {
+    display: inline-block;
+    margin-left: 10px;
+    background-color: #ccc;
+    color: #666;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: not-allowed;
+}
 
 body {
     background-color: #f2f2f2;
