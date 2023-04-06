@@ -30,7 +30,7 @@
 			<div class="post">
 				<p class="author">Posted by <a href="{{ url_for('profile', user_id=comment['user_id']) }}">{{ comment['username'] }}</a></p>
 				<p class="content">{{ comment['content'] }}</p>
-				<p class="upvotes">Upvotes: {{ comment['upvotes']}}<button class="upvote-button">Upvote</button></p>
+{#				<p class="upvotes">Upvotes: {{ comment['upvotes']}}<button class="upvote-button">Upvote</button></p>#}
 				<p class="creation_date">Posted on {{ comment['creation_date'] }}</p>
 			  </div>
             {% endfor %}
