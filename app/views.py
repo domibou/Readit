@@ -9,7 +9,7 @@ from datetime import datetime
 #TODO Search bar communities
 #TODO Changer description
 #TODO Dans profil, posts plus récents au top (ORDER BY creation_date)
-#TODO placeholders dans toutes les requetes (securite)
+#TODO Placeholders dans toutes les requetes (securite)
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
