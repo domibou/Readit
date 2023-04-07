@@ -4,9 +4,16 @@ from mysql import connector
 from app import app
 from datetime import datetime
 
+#TODO Post a reply
+#TODO Follow button
+#TODO Search bar communities
+#TODO Changer description
+#TODO Dans profil, posts plus récents au top (ORDER BY creation_date)
+#TODO placeholders dans toutes les requetes (securite)
+
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = 'po1iuytr'
+db_password = ''
 db_name = 'redditclone'
 
 @app.route('/')
@@ -141,7 +148,7 @@ def profile():
     cnx.close()
     return render_template('profile.html', profile=profile, communities=communities, posts=posts,postcount=postcount)
 
-@app.route('/post' )
+@app.route('/post')
 def post():
     post_id = request.args.get('post_id')
     post = []
@@ -161,11 +168,33 @@ def post():
         query = f"SELECT COUNT(*) FROM Upvote WHERE user_id = {session['user_id']} AND post_id = {post_id}"
         cursor.execute(query)
         result = cursor.fetchone()
-        canupvote =result[0]==0;
+        canupvote = result[0]==0;
+    return render_template('post.html', post=post, comments=loadreplies(post[0]['post_id']), canupvote=canupvote)
 
+# form pour créer le post   
+@app.route('/postcreation')
+def postcreation():
+    # community_id nécessaire pour plus tard, lorsque postcreation.html appellera /createpost
+    # name est nécessaire pour postcreation.html directement
+    community_id = request.args.get('community_id')
+    name = request.args.get('name')
+    return render_template('postcreation.html', community_id=community_id, name=name)
 
-    return render_template('post.html', post=post, comments=loadreplies(post[0]['post_id']),canupvote=canupvote)
-    
+# création du post à partir de la form
+@app.route('/createpost', methods=["POST", "GET"])
+def createpost():
+    community_id = request.args.get('community_id')
+    title = request.form['title']
+    text = request.form['text']
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
+    query = f"INSERT INTO Post(user_id, community_id, creation_date, content, title) VALUES ({session['user_id']}, {community_id}, CURRENT_DATE(), '{text}', '{title}')"
+    cursor.execute(query)
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+    return redirect(url_for('community', community_id=community_id))
+
 @app.route('/community')
 def community():
     community_id = request.args.get('community_id')
@@ -194,7 +223,6 @@ def community():
 
 def loadUserCommunities():
     communities = []
-
     if 'user' in session:
         user_id = session['user_id']
         cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
@@ -224,18 +252,20 @@ def upvote():
     return post()
 
 def loadposts(community_id=None):
+    n_posts = 20
     posts = []
     query = ''
-    if 'user' in session:
-        if community_id:
-            # Pour les posts d'une communauté
-            query = f"SELECT * FROM Post WHERE community_id = {community_id} LIMIT 20"
-        else:
-            # Pour des posts aléatoires des communautés suivies par l'utilisateur (pour la home page)
-            query = f"CALL RandomPosts({session['user_id']},5)"
+
+    if community_id:
+        # Pour les posts d'une communauté
+        query = f"SELECT * FROM Post WHERE community_id = {community_id} ORDER BY creation_date DESC LIMIT {n_posts};"
     else:
-        # Posts aléatoires dans le tableau au complet lorsqu'on n'est pas logged in
-        query = f"CALL RandomPostsNotLoggedIn(10)"
+        if 'user' in session:
+            # Pour des posts aléatoires des communautés suivies par l'utilisateur (pour la home page)
+            query = f"CALL RandomPosts({session['user_id']}, {n_posts})"
+        else:
+            # Posts aléatoires dans le tableau au complet lorsqu'on n'est pas logged in
+            query = f"CALL RandomPostsNotLoggedIn({n_posts})"
 
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
     cursor = cnx.cursor()
@@ -248,19 +278,16 @@ def loadposts(community_id=None):
                       'title': r[5]})
 
     # Récupère les noms des auteurs et des communautés reliés aux posts.
-    # Vraiment pas efficace mais on a seulement les identifiants dans notre table Post
+    # Vraiment pas efficace mais on a seulement les identifiants dans notre relation Post
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
     cursor = cnx.cursor()
     for p in posts:
         fillpost(p,cursor)
 
-
     cursor.close()
     cnx.close()
-
     return posts
     
-
 def loadreplies(post_id):#contains comment
     comments = []
     if 'user' in session:
@@ -275,7 +302,7 @@ def loadreplies(post_id):#contains comment
             comments.append({'comment_id': r[0], 'post_id': r[1], 'user_id': r[2],
                           'content': r[3], 'creation_date': r[4]})
 
-        # Récupère les noms des auteurs des comments.
+        # Récupère les noms des auteurs des comments
         for c in comments:
             # Auteur
             query = f"SELECT username FROM User WHERE user_id = {c['user_id']}"

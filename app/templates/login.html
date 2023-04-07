@@ -26,10 +26,11 @@
             ne soit envoyé-->
             <input id="encryptedPassword" type="hidden" name="encryptedPassword">
             <p><input type="submit" value="submit"></p>
+            <!--Si le serveur détecte une erreur dans le log in-->
             {% with messages = get_flashed_messages() %}
                 {% if messages %}
                     {% for msg in messages %}
-                        <p id="errorLogIn">{{msg}}</p>
+                        <p class="errorMessage">{{msg}}</p>
                     {% endfor %}
                 {% endif %}
             {% endwith %}

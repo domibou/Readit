@@ -6,7 +6,6 @@
 
 {% block body %}
 	<div class="community">
-		<img src="[insert image URL here]" alt="Community image">
 		<h1 class="community-name">{{ community[0]['name'] }}</h1>
 		<p>Followers: {{ followers }}</p>
 		<button class="largeButton">Follow</button>
@@ -14,7 +13,9 @@
 	<p class="description">{{ community[0]['description'] }}</p>
 	<p>{{ community[0]['tag'] }}</p>
 	<p class="creation-date">Created on {{ community[0]['creation_date'] }}</p>
-
+	<a href="{{ url_for('postcreation', community_id=community[0]['community_id'], name=community[0]['name']) }}" style="text-decoration: none">
+		<button class="largeButton">Create post</button>
+	</a>
 	{% if posts %}
         <div class="container">
             {% for post in posts %}

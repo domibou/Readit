@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Create post{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block body %}
+	<div>
+        <form id="createPostForm" method="post" action="{{ url_for('createpost', community_id=community_id) }}" onsubmit="return checkPost()">
+            <p>Create post in {{name}}</p>
+            <p>Title: </p>
+            <p><input type="text" class="field" name="title"></p>
+            <p>Text: </p>
+            <p><textarea type="text" class="field" name="text" rows="15" cols="80"></textarea></p>
+            <p><input type="submit" value="Create post"></p>
+            <!--message d'erreur apparait dans ce p tag si fonction checkPost() 
+            détermine qu'il y a erreur-->
+            <p id="errorCreatePostFields" class="errorMessage"></p>
+        </form>
+        <script>
+            function checkPost()
+            {
+                var inputs = document.getElementsByClassName("field");
+                for (var i = 0; i < inputs.length; i++)
+                {
+                    if (inputs[i].value.length == 0)
+                    {
+                        document.getElementById("errorCreatePostFields").innerHTML = "Please fill in all fields";
+                        return false;
+                    }
+                    if (inputs[i].value.length > 255)
+                    {
+                        document.getElementById("errorCreatePostFields").innerHTML = "Character limit exceeded";
+                        return false;
+                    }
+                }
+                return true;
+            }
+        </script>
+    </div>
+{% endblock %}
