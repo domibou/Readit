@@ -4,16 +4,13 @@ from mysql import connector
 from app import app
 from datetime import datetime
 
-#TODO Post a reply
-#TODO Follow button
-#TODO Search bar communities
+#TODO ameliorer Search bar communities
 #TODO Changer description
-#TODO Dans profil, posts plus récents au top (ORDER BY creation_date)
 #TODO Placeholders dans toutes les requetes (securite)
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = ''
+db_password = 'Po1iuytr'
 db_name = 'redditclone'
 
 @app.route('/')
@@ -118,7 +115,7 @@ def profile():
 
     #posts de l'utilisateur
     posts =[]
-    query = f"SELECT * FROM Post WHERE user_id = {user_id} "
+    query = f"SELECT * FROM Post WHERE user_id = {user_id} ORDER BY creation_date DESC"
     cursor.execute(query)
     result = cursor.fetchall()
     for r in result:
@@ -132,17 +129,9 @@ def profile():
         cursor.execute(query)
         result = cursor.fetchone()
         p['community'] = result[0]
-    # #commentaires de l'utilisateur
-    # comments =[]
-    # query = f"SELECT * FROM Comment WHERE user_id = {user_id} "
-    # cursor.execute(query)
-    # result = cursor.fetchall()
-    # for r in result:
-    #     comments.append({'comment_id': r[0], 'post_id': r[1], 'user_id': r[2],
-    #                      'content': r[3], 'creation_date': r[4]})
+
 
     postcount = len(posts)
-    # commentcount = len(comments)
 
     cursor.close()
     cnx.close()
@@ -164,12 +153,15 @@ def post():
 
     fillpost(post[0],cursor)
     canupvote = False
+    insession = False; # il veut pas si jle fais dans le html-_-
     if 'user' in session:
+        insession=True;
         query = f"SELECT COUNT(*) FROM Upvote WHERE user_id = {session['user_id']} AND post_id = {post_id}"
         cursor.execute(query)
         result = cursor.fetchone()
         canupvote = result[0]==0;
-    return render_template('post.html', post=post, comments=loadreplies(post[0]['post_id']), canupvote=canupvote)
+
+    return render_template('post.html', post=post, comments=loadreplies(post[0]['post_id']), canupvote=canupvote,insession=insession)
 
 # form pour créer le post   
 @app.route('/postcreation')
@@ -195,6 +187,26 @@ def createpost():
     cnx.close()
     return redirect(url_for('community', community_id=community_id))
 
+@app.route('/commentcreation')
+def commentcreation():
+    # community_id nécessaire pour plus tard, lorsque postcreation.html appellera /createpost
+    post_id = request.args.get('post_id')
+    title = request.args.get('title')
+    return render_template('commentcreation.html', post_id=post_id, title=title)
+
+@app.route('/createcomment', methods=["POST", "GET"])
+def createcomment():
+    post_id = request.args.get('post_id')
+    text = request.form['text']
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
+    query = f"INSERT INTO Comment(post_id , user_id , content, creation_date ) VALUES ({post_id}, {session['user_id']}, '{text}', CURRENT_DATE())"
+    cursor.execute(query)
+    cursor.close()
+    cnx.commit()
+    cnx.close()
+    return redirect(url_for('post', post_id=post_id))
+
 @app.route('/community')
 def community():
     community_id = request.args.get('community_id')
@@ -216,11 +228,37 @@ def community():
     result = cursor.fetchone()
     followers = result[0]
 
+    canfollow = False
+    insession = False
+    if 'user' in session:
+        insession=True
+        query = f"SELECT COUNT(*) FROM Subscription  WHERE user_id = {session['user_id']} AND community_id = {community_id}"
+        cursor.execute(query)
+        result = cursor.fetchone()
+        canfollow = result[0]==0;
+
     cursor.close()
     cnx.close()
     return render_template('community.html', community=community, 
-                           followers=followers, posts=loadposts(community[0]['community_id']))
+                           followers=followers, posts=loadposts(community[0]['community_id']),canfollow=canfollow,insession=insession)
 
+
+@app.route('/communitysearch')
+def communitysearch():
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
+    communities = [];
+
+    query = f"SELECT * FROM Community"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    for r in result:
+        communities.append({'community_id': r[0], 'description': r[1], 'tag': r[2],
+                      'name': r[3], 'creation_date': r[4]})
+
+    cursor.close()
+    cnx.close()
+    return render_template('communitysearch.html',communities=communities)
 def loadUserCommunities():
     communities = []
     if 'user' in session:
@@ -250,7 +288,20 @@ def upvote():
         cnx.commit()
 
     return post()
+@app.route('/follow' )
+def follow():
+    community_id = request.args.get('community_id')
+    cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+    cursor = cnx.cursor()
 
+    #follow
+    if 'user' in session:
+        query = f"INSERT INTO Subscription (user_id,community_id,since) VALUES ('{session['user_id']}', '{community_id}',CURRENT_DATE())"
+        cursor.execute(query)
+        cursor.fetchall()
+        cnx.commit()
+
+    return community()
 def loadposts(community_id=None):
     n_posts = 20
     posts = []

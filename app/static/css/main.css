@@ -64,6 +64,18 @@ button.largeButton {
     font-weight: bold;
     margin: 5px;
 }
+button.largeButtonDisabled {
+    padding: 10px 10px;
+    border:none;
+    border-radius: 12px;
+    background-color:  #ccc;
+    font-size: 16px;
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    margin: 5px;
+    cursor: not-allowed;
+}
 
 button.largeButton:hover {
     background-color: lightskyblue;
@@ -97,7 +109,7 @@ button.largeButton:hover {
     font-size: 14px;
     cursor: pointer;
 }
-.tst {
+.upvote-button-disabled {
     display: inline-block;
     margin-left: 10px;
     background-color: #ccc;

@@ -8,14 +8,22 @@
 	<div class="community">
 		<h1 class="community-name">{{ community[0]['name'] }}</h1>
 		<p>Followers: {{ followers }}</p>
-		<button class="largeButton">Follow</button>
+{#		<button class="largeButton">Follow</button>#}
+        {% if canfollow %}
+            <a href="{{ url_for('follow', community_id=community[0]['community_id']) }}" ><button class="largeButton" >Follow</button> </a>
+        {% endif %}
+        {% if not canfollow %}
+            <button class="largeButtonDisabled" >Follow</button>
+        {% endif %}
 	</div>
 	<p class="description">{{ community[0]['description'] }}</p>
 	<p>{{ community[0]['tag'] }}</p>
 	<p class="creation-date">Created on {{ community[0]['creation_date'] }}</p>
-	<a href="{{ url_for('postcreation', community_id=community[0]['community_id'], name=community[0]['name']) }}" style="text-decoration: none">
-		<button class="largeButton">Create post</button>
-	</a>
+    {% if insession %}
+	    <a href="{{ url_for('postcreation', community_id=community[0]['community_id'], name=community[0]['name']) }}" style="text-decoration: none">
+		    <button class="largeButton">Create post</button>
+	    </a>
+    {% endif %}
 	{% if posts %}
         <div class="container">
             {% for post in posts %}
