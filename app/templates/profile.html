@@ -8,7 +8,22 @@
 	<h1>{{ profile[0]['username'] }}</h1>
 
 	<h2>About {{ profile[0]['username'] }}</h2>
-	<p>{{ profile[0]['description'] }}</p>
+{#	<p>{{ profile[0]['description'] }}</p>#}
+{#    <input type="text" class="field" name="about" value="{{ profile[0]['description'] }}">#}
+{#    <p><textarea class="field" name="description" rows="15" cols="80">{{ profile[0]['description'] }}</textarea></p>#}
+{#    <a href="{{ url_for('updateprofile',description =getDec(), user_id=profile[0]['user_id']) }}" ><button class="largeButton" >Save</button> </a>#}
+{#    <script>#}
+{#        function getDec()#}
+{#            {#}
+{#                return document.querySelector('#description').value;#}
+{#            }#}
+{#    </script>#}
+        <form id="updateProfileForm" method="post" action="{{ url_for('updateprofile', user_id=profile[0]['user_id']) }}">
+            <p><textarea type="text" class="field" name="text" rows="15" cols="80">{{ profile[0]['description'] }}</textarea></p>
+            <p><input type="submit" value="save" class="saveForm"></p>
+        </form>
+
+
 
 	<p>Rating: {{ profile[0]['rating'] }}</p>
 
@@ -35,17 +50,4 @@
         </div>
         {% endif %}
 
-{#    <p>Comments made : {{ commentcount }}</p>#}
-{#	{% if comments %}#}
-{#        <div class="container">#}
-{#            {% for comment in comments %}#}
-{#			<div class="post">#}
-{#				<p class="author">Posted by <a href="{{ url_for('profile', user_id=comment['user_id']) }}">{{ comment['username'] }}</a></p>#}
-{#				<p class="content">{{ comment['content'] }}</p>#}
-{#				<p class="upvotes">Upvotes: {{ comment['upvotes']}}<button class="upvote-button">Upvote</button></p>#}
-{#				<p class="creation_date">Posted on {{ comment['creation_date'] }}</p>#}
-{#			  </div>#}
-{#            {% endfor %}#}
-{#        </div>#}
-{#        {% endif %}#}
 {% endblock %}

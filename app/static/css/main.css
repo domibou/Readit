@@ -231,5 +231,20 @@ input[type=submit]:hover {
   }
 
 
-  
+  #updateProfileForm {
+  display: inline-block;
+  border: none;
+  background-color: transparent;
+  padding: 0;
+}
+  #updateProfileForm textarea {
+  display: block;
+  width: 100%;
+  border: none;
+  resize: none;
+}
+  #updateProfileForm .saveForm {
+      display: block;
+
+}
   

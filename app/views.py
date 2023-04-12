@@ -10,7 +10,7 @@ from datetime import datetime
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = 'Po1iuytr'
+db_password = 'po1iuytr'
 db_name = 'redditclone'
 
 @app.route('/')
@@ -171,6 +171,21 @@ def postcreation():
     community_id = request.args.get('community_id')
     name = request.args.get('name')
     return render_template('postcreation.html', community_id=community_id, name=name)
+
+@app.route('/updateprofile', methods=["POST", "GET"])
+def updateprofile():
+    if request.method == "POST":
+        user_id = request.args.get('user_id')
+        text = request.form['text']
+        print(text)
+        cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
+        cursor = cnx.cursor()
+        query = f"UPDATE User SET description = '{text}' WHERE user_id = {user_id}"
+        cursor.execute(query)
+        cursor.close()
+        cnx.commit()
+        cnx.close()
+    return profile()
 
 # création du post à partir de la form
 @app.route('/createpost', methods=["POST", "GET"])
