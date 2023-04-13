@@ -15,7 +15,7 @@
             }
             document.getElementById("loginForm").addEventListener("submit", function() {this.reset();});
         </script>
-        <form id="loginForm" method="post" action="/signup" onsubmit="return encryptPassword()">
+        <form class=customForm id="loginForm" method="post" action="/signup" onsubmit="return encryptPassword()">
             <p>Email: </p>
             <p><input type="text" name="email"></p>
             <p>Username: </p>

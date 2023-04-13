@@ -8,7 +8,6 @@
 	<div class="community">
 		<h1 class="community-name">{{ community[0]['name'] }}</h1>
 		<p>Followers: {{ followers }}</p>
-{#		<button class="largeButton">Follow</button>#}
         {% if canfollow %}
             <a href="{{ url_for('follow', community_id=community[0]['community_id']) }}" ><button class="largeButton" >Follow</button> </a>
         {% endif %}

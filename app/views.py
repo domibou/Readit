@@ -4,8 +4,6 @@ from mysql import connector
 from app import app
 from datetime import datetime
 
-#TODO ameliorer Search bar communities
-#TODO Changer description
 #TODO Placeholders dans toutes les requetes (securite)
 
 # Utilisez vos informations de connexion à MySQL ici
@@ -107,12 +105,6 @@ def profile():
         communities.append({'community_id': r[0], 'description': r[1], 'tag': r[2],
                       'name': r[3], 'creation_date': r[4]})
 
-    # # Nombre de posts faits par l'utilisateur
-    # query = f"SELECT COUNT(*) FROM MakesPost WHERE user_id = {user_id}"
-    # cursor.execute(query)
-    # result = cursor.fetchone()
-    # posts = result[0]
-
     #posts de l'utilisateur
     posts =[]
     query = f"SELECT * FROM Post WHERE user_id = {user_id} ORDER BY creation_date DESC"
@@ -135,7 +127,8 @@ def profile():
 
     cursor.close()
     cnx.close()
-    return render_template('profile.html', profile=profile, communities=communities, posts=posts,postcount=postcount)
+
+    return render_template('profile.html', profile=profile, communities=communities, posts=posts,postcount=postcount, user =session['user_id'])
 
 @app.route('/post')
 def post():
@@ -264,13 +257,12 @@ def communitysearch():
     cursor = cnx.cursor()
     communities = [];
 
-    query = f"SELECT * FROM Community"
+    query = f"SELECT * FROM Community ORDER BY name"
     cursor.execute(query)
     result = cursor.fetchall()
     for r in result:
         communities.append({'community_id': r[0], 'description': r[1], 'tag': r[2],
                       'name': r[3], 'creation_date': r[4]})
-
     cursor.close()
     cnx.close()
     return render_template('communitysearch.html',communities=communities)

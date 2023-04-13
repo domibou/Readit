@@ -6,7 +6,7 @@
 
 {% block body %}
 	<div>
-        <form id="createPostForm" method="post" action="{{ url_for('createpost', community_id=community_id) }}" onsubmit="return checkPost()">
+        <form class=customForm id="createPostForm" method="post" action="{{ url_for('createpost', community_id=community_id) }}" onsubmit="return checkPost()">
             <p>Create post in {{name}}</p>
             <p>Title: </p>
             <p><input type="text" class="field" name="title"></p>

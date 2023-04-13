@@ -8,6 +8,7 @@
     </div>
     <div style="display: flex; flex-direction: column; flex-wrap: wrap">
         <div style="display: flex; flex-direction: column; justify-content: flex-start">
+            <a href="{{ url_for('communitysearch') }}" ><button class="largeButton" >Find a Community</button> </a>
             <h3>My Communities</h3>
             <div style="display: flex; flex-direction: row; justify-content: flex-start">
             {% for c in communities %}
@@ -18,7 +19,7 @@
             </a>
             {% endfor %}
             </div>
-        <a href="{{ url_for('communitysearch') }}" ><button class="largeButton" >com search</button> </a>
+
         </div>
         {% if posts %}
         <div class="container">

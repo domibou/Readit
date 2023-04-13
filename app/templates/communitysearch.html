@@ -1,17 +1,18 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %}Community Search{% endblock %}
+
+{% block header %}
+{% endblock %}
+{% block body %}
+    <p><h1>Communities :</h1></p>
     {% for c in communities %}
-		<a href="{{ url_for('community', community_id=c['community_id']) }}">
-            <button class="communityButton" style="padding: 6px; margin: 0px 2px 0px; border-radius: 20px; font-size: 16px; cursor: pointer">
-                {{ c['name'] }}
-            </button>
-        </a>
+        <p style="display: flex; justify-content: center;">
+            <a href="{{ url_for('community', community_id=c['community_id']) }}">
+                <button class="communitySearch" >
+                    {{ c['name'] }}
+                </button>
+            </a>
+        </p>
     {% endfor %}
 
-</body>
-</html>
+{% endblock %}

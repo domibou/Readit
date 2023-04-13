@@ -63,6 +63,7 @@ button.largeButton {
     color: white;
     font-weight: bold;
     margin: 5px;
+    cursor: pointer
 }
 button.largeButtonDisabled {
     padding: 10px 10px;
@@ -82,13 +83,20 @@ button.largeButton:hover {
     color: black;
 }
 
-/*.communityButton {*/
-/*    padding: 6px;*/
-/*    margin: 0px 2px 0px;*/
-/*    border-radius: 20px;*/
-/*    font-size: 16px;*/
-/*    cursor: pointer;*/
-/*}*/
+.communityButton {
+    padding: 6px;
+    margin: 0px 2px 0px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.communitySearch {
+    padding: 12px 20px;
+    margin: 30px 0px 0px 0px;
+    border-radius: 30px;
+    font-size: 24px;
+    cursor: pointer;
+}
 
 .tag {
     background-color: green;
@@ -102,7 +110,7 @@ button.largeButton:hover {
 .upvote-button {
     display: inline-block;
     margin-left: 10px;
-    background-color: #0077cc;
+    background-color: cornflowerblue;
     color: white;
     border: none;
     border-radius: 5px;
@@ -119,6 +127,10 @@ button.largeButton:hover {
     font-size: 14px;
     cursor: not-allowed;
 }
+.upvote-button:hover {
+    background-color: lightskyblue;
+    color: black;
+}
 
 body {
     background-color: #f2f2f2;
@@ -128,15 +140,7 @@ body {
 h1 {
     text-align: center;
 }
-  
-form {
-    margin: auto;
-    width: 50%;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
+
   
 label {
     display: block;
@@ -229,13 +233,12 @@ input[type=submit]:hover {
   .post .subreddit:hover {
     text-decoration: underline;
   }
-
+.userDescription{
+    pointer-events: none;
+}
 
   #updateProfileForm {
   display: inline-block;
-  border: none;
-  background-color: transparent;
-  padding: 0;
 }
   #updateProfileForm textarea {
   display: block;
@@ -243,8 +246,14 @@ input[type=submit]:hover {
   border: none;
   resize: none;
 }
-  #updateProfileForm .saveForm {
-      display: block;
 
+
+  .customForm {
+    margin: auto;
+    width: 50%;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
   

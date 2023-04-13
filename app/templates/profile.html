@@ -8,21 +8,15 @@
 	<h1>{{ profile[0]['username'] }}</h1>
 
 	<h2>About {{ profile[0]['username'] }}</h2>
-{#	<p>{{ profile[0]['description'] }}</p>#}
-{#    <input type="text" class="field" name="about" value="{{ profile[0]['description'] }}">#}
-{#    <p><textarea class="field" name="description" rows="15" cols="80">{{ profile[0]['description'] }}</textarea></p>#}
-{#    <a href="{{ url_for('updateprofile',description =getDec(), user_id=profile[0]['user_id']) }}" ><button class="largeButton" >Save</button> </a>#}
-{#    <script>#}
-{#        function getDec()#}
-{#            {#}
-{#                return document.querySelector('#description').value;#}
-{#            }#}
-{#    </script>#}
+    {% if user == profile[0]['user_id'] %}
         <form id="updateProfileForm" method="post" action="{{ url_for('updateprofile', user_id=profile[0]['user_id']) }}">
             <p><textarea type="text" class="field" name="text" rows="15" cols="80">{{ profile[0]['description'] }}</textarea></p>
-            <p><input type="submit" value="save" class="saveForm"></p>
+            <p><input type="submit" value="save changes" class="saveForm"></p>
         </form>
-
+    {% endif %}
+    {% if user != profile[0]['user_id'] %}
+        <p><textarea type="text" class="userDescription" name="text" rows="15" cols="80">{{ profile[0]['description'] }}</textarea></p>
+    {% endif %}
 
 
 	<p>Rating: {{ profile[0]['rating'] }}</p>
@@ -32,7 +26,7 @@
 	<h2>Subscribed to:</h2>
 	{% for c in communities %}
 		<a href="{{ url_for('community', community_id=c['community_id']) }}">
-            <button class="communityButton" style="padding: 6px; margin: 0px 2px 0px; border-radius: 20px; font-size: 16px; cursor: pointer">
+            <button class="communityButton" >
                 {{ c['name'] }}
             </button>
         </a>

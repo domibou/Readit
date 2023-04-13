@@ -6,7 +6,7 @@
 
 {% block body %}
 	<div>
-        <form id="createReplyForm" method="post" action="{{ url_for('createcomment', post_id=post_id) }}" onsubmit="return checkPost()">
+        <form class=customForm id="createReplyForm" method="post" action="{{ url_for('createcomment', post_id=post_id) }}" onsubmit="return checkPost()">
             <p>reply to {{title}}</p>
             <p>Text: </p>
             <p><textarea type="text" class="field" name="text" rows="15" cols="80"></textarea></p>
