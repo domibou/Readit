@@ -12,6 +12,13 @@
         <form id="updateProfileForm" method="post" action="{{ url_for('updateprofile', user_id=profile[0]['user_id']) }}">
             <p><textarea type="text" class="field" name="text" rows="15" cols="80">{{ profile[0]['description'] }}</textarea></p>
             <p><input type="submit" value="save changes" class="saveForm"></p>
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for msg in messages %}
+                        <p class="errorMessage">{{msg}}</p>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
         </form>
     {% endif %}
     {% if user != profile[0]['user_id'] %}

@@ -23,12 +23,12 @@
                 {
                     if (inputs[i].value.length == 0)
                     {
-                        document.getElementById("errorCreatePostFields").innerHTML = "Please fill in all fields";
+                        document.getElementById("errorCreateReplyFields").innerHTML = "Please fill in all fields";
                         return false;
                     }
                     if (inputs[i].value.length > 255)
                     {
-                        document.getElementById("errorCreatePostFields").innerHTML = "Character limit exceeded";
+                        document.getElementById("errorCreateReplyFields").innerHTML = "Character limit exceeded";
                         return false;
                     }
                 }

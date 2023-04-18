@@ -8,7 +8,7 @@ from datetime import datetime
 
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = 'po1iuytr'
+db_password = 'Po1iuytr2'
 db_name = 'redditclone'
 
 @app.route('/')
@@ -69,9 +69,18 @@ def signup():
         current_time = datetime.today()
         formatted_date = current_time.strftime('%Y-%m-%d')
 
-        cursor = cnx.cursor()
         query = f"INSERT INTO User(username, creation_date, email, password) VALUES ('{username}', '{formatted_date}', '{email}', '{password}')"
-        cursor.execute(query)
+
+        cursor = cnx.cursor()
+        try:
+            cursor.execute(query)
+        except connector.errors.IntegrityError as e:
+            flash("User already exists")
+            return render_template('signup.html')
+        except connector.errors.DataError as e:
+            split_msg = e.msg.split('\'')
+            flash(f"Invalid input for {split_msg[1]}")
+            return render_template('signup.html')
         cursor.fetchall()
         cnx.commit()
 
@@ -127,8 +136,8 @@ def profile():
 
     cursor.close()
     cnx.close()
-
-    return render_template('profile.html', profile=profile, communities=communities, posts=posts,postcount=postcount, user =session['user_id'])
+    user = session['user_id'] if 'user' in session else None
+    return render_template('profile.html', profile=profile, communities=communities, posts=posts,postcount=postcount, user =user)
 
 @app.route('/post')
 def post():
@@ -173,8 +182,13 @@ def updateprofile():
         print(text)
         cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
         cursor = cnx.cursor()
-        query = f"UPDATE User SET description = '{text}' WHERE user_id = {user_id}"
-        cursor.execute(query)
+        query = f"UPDATE User SET description = %s WHERE user_id = {user_id}"
+        text_string = (f"{text}", )
+        try:
+            cursor.execute(query, text_string)
+        except connector.errors.DataError as e:
+            flash("Description is too long")
+            return profile()
         cursor.close()
         cnx.commit()
         cnx.close()
