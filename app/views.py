@@ -1,14 +1,11 @@
 from flask import render_template, session, request, redirect, url_for, flash
-import hashlib
 from mysql import connector
 from app import app
 from datetime import datetime
 
-#TODO Placeholders dans toutes les requetes (securite)
-
 # Utilisez vos informations de connexion à MySQL ici
 db_user = 'root'
-db_password = 'Po1iuytr2'
+db_password = '954Bibafou'
 db_name = 'redditclone'
 
 @app.route('/')
@@ -38,6 +35,7 @@ def login():
         cursor.execute(query, val)
         result = cursor.fetchone()
 
+        # Si un utilisateur a été trouvé
         if result is not None and result[6] == password:
             session['user_id'] = result[0]
             session['user'] = result[1]
@@ -88,7 +86,6 @@ def signup():
         cnx.close()
         return render_template('login.html')
     else:
-
         return render_template('signup.html')
 
 @app.route('/profile')
@@ -131,7 +128,6 @@ def profile():
         result = cursor.fetchone()
         p['community'] = result[0]
 
-
     postcount = len(posts)
 
     cursor.close()
@@ -146,7 +142,7 @@ def post():
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
     cursor = cnx.cursor()
 
-    # Informations sur le post
+    # Informations sur la publication
     query = f"SELECT * FROM Post WHERE post_id = {post_id}"
     cursor.execute(query)
     result = cursor.fetchone()
@@ -162,10 +158,9 @@ def post():
         cursor.execute(query)
         result = cursor.fetchone()
         canupvote = result[0]==0;
-
     return render_template('post.html', post=post, comments=loadreplies(post[0]['post_id']), canupvote=canupvote,insession=insession)
 
-# form pour créer le post   
+# formulaire pour créer le post   
 @app.route('/postcreation')
 def postcreation():
     # community_id nécessaire pour plus tard, lorsque postcreation.html appellera /createpost
@@ -174,6 +169,7 @@ def postcreation():
     name = request.args.get('name')
     return render_template('postcreation.html', community_id=community_id, name=name)
 
+# Pour modifier la description utilisateur
 @app.route('/updateprofile', methods=["POST", "GET"])
 def updateprofile():
     if request.method == "POST":
@@ -184,17 +180,19 @@ def updateprofile():
         cursor = cnx.cursor()
         query = f"UPDATE User SET description = %s WHERE user_id = {user_id}"
         text_string = (f"{text}", )
+
         try:
             cursor.execute(query, text_string)
         except connector.errors.DataError as e:
             flash("Description is too long")
             return profile()
+        
         cursor.close()
         cnx.commit()
         cnx.close()
     return profile()
 
-# création du post à partir de la form
+# création de la publication à partir du formulaire
 @app.route('/createpost', methods=["POST", "GET"])
 def createpost():
     community_id = request.args.get('community_id')
@@ -211,7 +209,6 @@ def createpost():
 
 @app.route('/commentcreation')
 def commentcreation():
-    # community_id nécessaire pour plus tard, lorsque postcreation.html appellera /createpost
     post_id = request.args.get('post_id')
     title = request.args.get('title')
     return render_template('commentcreation.html', post_id=post_id, title=title)
@@ -243,7 +240,6 @@ def community():
     community.append({'community_id': result[0], 'description': result[1], 'tag': result[2],
                       'name': result[3], 'creation_date': result[4]})
     
-
     # Nombre d'abonnés
     query = f"SELECT COUNT(*) FROM Subscription WHERE community_id = {community[0]['community_id']}"
     cursor.execute(query)
@@ -264,7 +260,7 @@ def community():
     return render_template('community.html', community=community, 
                            followers=followers, posts=loadposts(community[0]['community_id']),canfollow=canfollow,insession=insession)
 
-
+# Fonction interne pour récupérer les communautés suivies par l'utilisateur
 @app.route('/communitysearch')
 def communitysearch():
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
@@ -280,6 +276,7 @@ def communitysearch():
     cursor.close()
     cnx.close()
     return render_template('communitysearch.html',communities=communities)
+
 def loadUserCommunities():
     communities = []
     if 'user' in session:
@@ -295,6 +292,7 @@ def loadUserCommunities():
         cursor.close()
         cnx.close()
     return communities
+
 @app.route('/upvote' )
 def upvote():
     post_id = request.args.get('post_id')
@@ -307,8 +305,8 @@ def upvote():
         cursor.execute(query)
         cursor.fetchall()
         cnx.commit()
-
     return post()
+
 @app.route('/follow' )
 def follow():
     community_id = request.args.get('community_id')
@@ -321,27 +319,29 @@ def follow():
         cursor.execute(query)
         cursor.fetchall()
         cnx.commit()
-
     return community()
+
+# Fonction interne pour la récupération de publications
 def loadposts(community_id=None):
     n_posts = 20
     posts = []
     query = ''
 
     if community_id:
-        # Pour les posts d'une communauté
+        # Pour les publications d'une communauté
         query = f"SELECT * FROM Post WHERE community_id = {community_id} ORDER BY creation_date DESC LIMIT {n_posts};"
     else:
         if 'user' in session:
-            # Pour des posts aléatoires des communautés suivies par l'utilisateur (pour la home page)
+            # Pour des publications aléatoires des communautés suivies par l'utilisateur (pour la page d'accueil)
             query = f"CALL RandomPosts({session['user_id']}, {n_posts})"
         else:
-            # Posts aléatoires dans le tableau au complet lorsqu'on n'est pas logged in
+            # Posts aléatoires dans le tableau au complet lorsqu'on n'est pas connecté
             query = f"CALL RandomPostsNotLoggedIn({n_posts})"
 
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
     cursor = cnx.cursor()
-    # Informations sur les posts
+
+    # Informations sur les publications
     cursor.execute(query)
     result = cursor.fetchall()
     for r in result:
@@ -349,8 +349,7 @@ def loadposts(community_id=None):
                       'creation_date': r[3], 'content': r[4],
                       'title': r[5]})
 
-    # Récupère les noms des auteurs et des communautés reliés aux posts.
-    # Vraiment pas efficace mais on a seulement les identifiants dans notre relation Post
+    # Récupère les noms des auteurs et des communautés reliés aux publications
     cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
     cursor = cnx.cursor()
     for p in posts:
@@ -360,7 +359,8 @@ def loadposts(community_id=None):
     cnx.close()
     return posts
     
-def loadreplies(post_id):#contains comment
+# Fonction interne pour récupérer les commentaires
+def loadreplies(post_id):
     comments = []
     if 'user' in session:
         cnx = connector.connect(user=db_user, password=db_password, host='localhost', database=db_name)
@@ -382,11 +382,11 @@ def loadreplies(post_id):#contains comment
             result = cursor.fetchone()
             c['username'] = result[0]
 
-
         cursor.close()
         cnx.close()
     return comments
 
+# Fonction interne pour récupérer les informations sur une publication
 def fillpost(post, cursor):
 
     # Auteur
@@ -395,19 +395,19 @@ def fillpost(post, cursor):
     result = cursor.fetchone()
     post['username'] = result[0]
 
-    # Nom communaute
+    # Nom communauté
     query = f"SELECT name FROM Community WHERE community_id = {post['community_id']}"
     cursor.execute(query)
     result = cursor.fetchone()
     post['community'] = result[0]
 
-    # Nombre d'upvotes
+    # Nombre de votes positifs
     query = f"SELECT COUNT(*) FROM Upvote WHERE post_id  = {post['post_id']}"
     cursor.execute(query)
     result = cursor.fetchone()
     post['upvotes'] = result[0]
 
-    # Nombre de replies
+    # Nombre de commentaires
     query = f"SELECT COUNT(*) FROM Comment WHERE post_id  = {post['post_id']}"
     cursor.execute(query)
     result = cursor.fetchone()

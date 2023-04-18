@@ -7,14 +7,7 @@
 {% block body %}
 	<div>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-        <script>
-            function encryptPassword()
-            {
-                document.getElementById("encryptedPassword").value = CryptoJS.SHA256(document.getElementById("password").value);
-                return true;
-            }
-            document.getElementById("loginForm").addEventListener("submit", function() {this.reset();});
-        </script>
+        <script src="main.js"></script>
         <form class=customForm id="loginForm" method="post" action="/login" onsubmit="return encryptPassword()">
             <p>Username: </p>
             <p><input type="text" name="username"></p>

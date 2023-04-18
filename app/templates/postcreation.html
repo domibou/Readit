@@ -17,25 +17,6 @@
             détermine qu'il y a erreur-->
             <p id="errorCreatePostFields" class="errorMessage"></p>
         </form>
-        <script>
-            function checkPost()
-            {
-                var inputs = document.getElementsByClassName("field");
-                for (var i = 0; i < inputs.length; i++)
-                {
-                    if (inputs[i].value.length == 0)
-                    {
-                        document.getElementById("errorCreatePostFields").innerHTML = "Please fill in all fields";
-                        return false;
-                    }
-                    if (inputs[i].value.length > 255)
-                    {
-                        document.getElementById("errorCreatePostFields").innerHTML = "Character limit exceeded";
-                        return false;
-                    }
-                }
-                return true;
-            }
-        </script>
+        <script src="main.js"></script>
     </div>
 {% endblock %}
